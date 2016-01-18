@@ -15,7 +15,7 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Download nova source codes
-RUN git clone $nova_repo --single-branch --branch $nova_branch; 
+RUN git clone $nova_repo --single-branch --branch $nova_branch;
 
 # Checkout commit, if it was defined above
 RUN if [ ! -z $nova_commit ]; then cd nova && git checkout $nova_commit; fi
@@ -26,14 +26,14 @@ COPY patches/* /patches/
 RUN /patches/patch.sh
 
 # Install nova with dependencies
-RUN cd nova; pip install -r requirements.txt; pip install supervisor mysql-python; python setup.py install
+RUN cd nova; apt-get update; apt-get install -y libxml2-dev libxslt1-dev; pip install -r requirements.txt; pip install supervisor mysql-python; python setup.py install
 
 # prepare directories for supervisor
 RUN mkdir -p /etc/supervisord /var/log/supervisord
 
 # prepare necessary stuff
 RUN mkdir -p /var/log/nova && \
-    useradd -M -s /sbin/nologin nova && \
+    useradd -M -s /sbin/nologin nova
 
 # copy nova configs
 COPY configs/nova/* /etc/nova/
