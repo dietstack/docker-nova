@@ -4,6 +4,7 @@ MAINTAINER Kamil Madac (kamil.madac@t-systems.sk)
 
 ENV http_proxy="http://172.27.10.114:3128"
 ENV https_proxy="http://172.27.10.114:3128"
+ENV no_proxy="locahost,127.0.0.1"
 
 # Source codes to download
 ENV nova_repo="https://github.com/openstack/nova"
@@ -26,20 +27,35 @@ COPY patches/* /patches/
 RUN /patches/patch.sh
 
 # Install nova with dependencies
-RUN cd nova; apt-get update; apt-get install -y libxml2-dev libxslt1-dev; pip install -r requirements.txt; pip install supervisor mysql-python; python setup.py install
+RUN cd nova; apt-get update; \
+    apt-get install -y --no-install-recommends \
+    libxml2-dev \
+    libxslt1-dev \
+    iptables \
+    dnsmasq \
+    bridge-utils \
+    python-libvirt \
+    openvswitch-switch \
+    ebtables \
+    spice-html5; \
+    pip install -r requirements.txt; \
+    pip install supervisor mysql-python; \
+    python setup.py install
 
 # prepare directories for supervisor
-RUN mkdir -p /etc/supervisord /var/log/supervisord
+RUN mkdir -p /etc/supervisor.d /var/log/supervisord
 
 # prepare necessary stuff
-RUN mkdir -p /var/log/nova && \
+RUN mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock && \
     useradd -M -s /sbin/nologin nova
 
 # copy nova configs
 COPY configs/nova/* /etc/nova/
+COPY configs/nova/rootwrap.d /etc/nova/rootwrap.d
 
-# copy supervisor config
+# copy supervisor configs
 COPY configs/supervisord/supervisord.conf /etc
+COPY configs/supervisord/supervisor.d/* /etc/supervisor.d/
 
 # external volume
 VOLUME /nova-override

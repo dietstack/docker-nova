@@ -8,6 +8,10 @@ if [[ $DEBUG ]]; then
         DEBUG_OPT=true
 fi
 
+# same image can be used in controller and compute node as well
+# if true, CONTROL_SRVCS will be activated, if false, COMUPTE_SRVCS will be activated
+NOVA_CONTROLLER=${NOVA_CONTROLLER:-true}
+
 # define variable defaults
 
 CPU_NUM=$(grep -c ^processor /proc/cpuinfo)
@@ -18,7 +22,7 @@ DB_PASSWORD=${DB_PASSWORD:-veryS3cr3t}
 
 MY_IP=${MY_IP:-127.0.0.1}
 OSAPI_LISTEN_IP=${OSAPI_LISTEN_IP:-0.0.0.0}
-OSAPI_LISTEN_PORT=${OSAPI_LISTEN_PORT:-5}
+OSAPI_LISTEN_PORT=${OSAPI_LISTEN_PORT:-8774}
 OSAPI_COMPUTE_WORKERS=${CPU_NUM}
 METADATA_LISTEN_IP=${METADATA_LISTEN_IP:-0.0.0.0}
 METADATA_LISTEN_PORT=${METADATA_LISTEN_PORT:-8775}
@@ -30,9 +34,11 @@ ADMIN_PASSWORD=${ADMIN_PASSWORD:-veryS3cr3t}
 LOG_MESSAGE="Docker start script:"
 OVERRIDE=0
 CONF_DIR="/etc/nova"
+SUPERVISOR_CONF_DIR="/etc/supervisor.d"
 OVERRIDE_DIR="/nova-override"
 CONF_FILES=(`find $CONF_DIR -maxdepth 1 -type f -printf "%f\n"`)
-
+CONTROL_SRVCS="nova-api nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spicehtml5proxy"
+COMPUTE_SRVCS="nova-compute"
 
 # check if external configs are provided
 echo "$LOG_MESSAGE Checking if external config is provided.."
@@ -67,7 +73,13 @@ if [[ $OVERRIDE -eq 0 ]]; then
         echo "$LOG_MESSAGE  ==> done"
 fi
 
-#[[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage db sync
+if [[ $NOVA_CONTROLLER == "true" ]]; then
+        for SRVC in "$COMPUTE_SRVCS"; do
+            mv ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ${SUPERVISOR_CONF_DIR}/${SRVC}.disabled
+        done
+fi
+
+[[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage db sync
 
 echo "$LOG_MESSAGE starting nova"
 exec "$@"
