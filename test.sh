@@ -15,6 +15,7 @@ cleanup() {
     docker stop keystone
     docker stop glance
     docker stop nova-controller
+    docker stop nova-compute
 
     docker rm galera
     docker rm memcached
@@ -22,6 +23,7 @@ cleanup() {
     docker rm keystone
     docker rm glance
     docker rm nova-controller
+    docker rm nova-compute
 }
 
 cleanup
@@ -101,6 +103,13 @@ docker run -d --net=host --privileged \
            -e DB_SYNC="true" \
            -e NOVA_CONTROLLER="true" \
            --name nova-controller \
+           nova:latest
+
+echo "Starting nova-compute container"
+docker run -d --net=host \
+           -e DEBUG="true" \
+           -e NOVA_CONTROLLER="false" \
+           --name nova-compute \
            nova:latest
 
 ##### Wait till underlying services are ready #####
