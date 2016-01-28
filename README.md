@@ -13,7 +13,7 @@ Result will be nova image in a local image registry.
 This image can be run in two roles. Either as controller or as compute. This two roles differs in a services which are exectuted by supervisor.
 
 ### Controller role
-Following services are exectuted when variable `NOVA_CONTROLLER` is set to true:
+Following services are exectuted when variable `NOVA_CONTROLLER` is set to `true` (default):
 
   * nova-api
   * nova-cert
@@ -23,6 +23,7 @@ Following services are exectuted when variable `NOVA_CONTROLLER` is set to true:
   * nova-spicehtml5proxy
 
 ### Compute role
+When `NOVA_CONTROLLER` set to `false` only one service is executed:
 
   * nova-compute
 
@@ -35,9 +36,19 @@ connection_uri = qemu+tcp://127.0.0.1:16509/system
 
 We need to configure libvirt on host system as follow:
 
-  * Disable auth (auth_unix_ro = "none" in `/etc/libvirt/libvirtd.conf`)
-  * Listen on 127.0.0.1 - configure in `/etc/default/libvirt-bin`:
-    * libvirtd_opts="-d -l"
-    * listen_tls = 0
-    * listen_tcp = 1
+edit /etc/libvirt/libvirtd.conf:
+
+```
+auth_unix_ro = "none"
+listen_tls = 0
+listen_tcp = 1
+```
+
+add LIBVIRTD_ARGS="-l" in /lib/systemd/system/libvirt-bin.service
+
+restart libvirt:
+
+```
+systemctl restart libvirt-bin.service
+```
 

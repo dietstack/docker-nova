@@ -74,7 +74,11 @@ if [[ $OVERRIDE -eq 0 ]]; then
 fi
 
 if [[ $NOVA_CONTROLLER == "true" ]]; then
-        for SRVC in "$COMPUTE_SRVCS"; do
+        for SRVC in $COMPUTE_SRVCS; do
+            mv ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ${SUPERVISOR_CONF_DIR}/${SRVC}.disabled
+        done
+else
+        for SRVC in $CONTROL_SRVCS; do
             mv ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ${SUPERVISOR_CONF_DIR}/${SRVC}.disabled
         done
 fi

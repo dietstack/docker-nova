@@ -46,7 +46,7 @@ RUN cd nova; apt-get update; \
 RUN mkdir -p /etc/supervisor.d /var/log/supervisord
 
 # prepare necessary stuff
-RUN mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock && \
+RUN mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock /var/lib/nova/instances && \
     useradd -M -s /sbin/nologin nova
 
 # copy nova configs

@@ -99,6 +99,7 @@ echo "Starting nova-controller container"
 docker run -d --net=host --privileged \
            -e DEBUG="true" \
            -e DB_SYNC="true" \
+           -e NOVA_CONTROLLER="true" \
            --name nova-controller \
            nova:latest
 
