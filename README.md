@@ -46,7 +46,10 @@ listen_tls = 0
 listen_addr = "127.0.0.1"
 ```
 
-add LIBVIRTD_ARGS="-l" in /lib/systemd/system/libvirt-bin.service
+cp /lib/systemd/system/libvirt-bin.service to /etc/systemd/system and modify LIBVIRTD_ARGS to:
+```
+LIBVIRTD_ARGS="-l"
+```
 
 restart libvirt:
 
