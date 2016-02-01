@@ -43,6 +43,7 @@ auth_tcp = "none"
 auth_tls = "none"
 listen_tcp = 1
 listen_tls = 0
+listen_addr = "127.0.0.1"
 ```
 
 add LIBVIRTD_ARGS="-l" in /lib/systemd/system/libvirt-bin.service
