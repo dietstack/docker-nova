@@ -79,14 +79,14 @@ docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name keystone keyst
 
 echo "Wait till keystone is running ."
 
-wait_for_port 5000 30
+wait_for_port 5000 60
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 5000 (Keystone) not bounded!"
     exit $ret
 fi
 
-wait_for_port 35357 30
+wait_for_port 35357 60
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 35357 (Keystone Admin) not bounded!"
@@ -114,14 +114,14 @@ docker run -d --net=host \
 
 ##### Wait till underlying services are ready #####
 
-wait_for_port 9191 30
+wait_for_port 9191 60
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 9191 (Glance Registry) not bounded!"
     exit $ret
 fi
 
-wait_for_port 9292 30
+wait_for_port 9292 60
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 9292 (Glance API) not bounded!"
@@ -145,21 +145,21 @@ fi
 
 # TESTS
 
-wait_for_port 8774 30
+wait_for_port 8774 60
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 8774 (Nova-Api) not bounded!"
     exit $ret
 fi
 
-wait_for_port 8775 30
+wait_for_port 8775 60
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 8775 (Metadata) not bounded!"
     exit $ret
 fi
 
-wait_for_port 6082 30
+wait_for_port 6082 60
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 6082 (spice html5proxy) not bounded!"
