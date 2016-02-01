@@ -39,9 +39,10 @@ We need to configure libvirt on host system as follow:
 edit /etc/libvirt/libvirtd.conf:
 
 ```
-auth_unix_ro = "none"
-listen_tls = 0
+auth_tcp = "none"
+auth_tls = "none"
 listen_tcp = 1
+listen_tls = 0
 ```
 
 add LIBVIRTD_ARGS="-l" in /lib/systemd/system/libvirt-bin.service
