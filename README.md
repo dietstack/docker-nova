@@ -57,3 +57,15 @@ restart libvirt:
 systemctl restart libvirt-bin.service
 ```
 
+### Running
+
+Image in controllrer node needs to be run in privileged mode:
+
+```
+docker run -d --net=host --privileged \
+              -e DEBUG="true" \
+              -e NOVA_CONTROLLER="true" \
+              --name nova-controller \
+              nova:latest
+```
+
