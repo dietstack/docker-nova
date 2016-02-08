@@ -31,6 +31,8 @@ ADMIN_TENANT_NAME=${ADMIN_TENANT_NAME:-service}
 ADMIN_USER=${ADMIN_USER:-nova}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-veryS3cr3t}
 
+NEUTRON_ADMIN_PASSWORD=${NEUTRON_ADMIN_PASSWORD:-veryS3cr3t}
+
 LOG_MESSAGE="Docker start script:"
 OVERRIDE=0
 CONF_DIR="/etc/nova"
@@ -55,20 +57,21 @@ if [[ $OVERRIDE -eq 0 ]]; then
         for CONF in ${CONF_FILES[*]}; do
                 echo "$LOG_MESSAGE generating $CONF file ..."
 
-                sed -i "s/_DB_HOST_/$DB_HOST/" $CONF_DIR/$CONF
-                sed -i "s/_DB_PORT_/$DB_PORT/" $CONF_DIR/$CONF
-                sed -i "s/_DB_PASSWORD_/$DB_PASSWORD/" $CONF_DIR/$CONF
-                sed -i "s/_MY_IP_/$MY_IP/" $CONF_DIR/$CONF
-                sed -i "s/_OSAPI_LISTEN_IP_/$OSAPI_LISTEN_IP/" $CONF_DIR/$CONF
-                sed -i "s/_OSAPI_LISTEN_PORT_/$OSAPI_LISTEN_PORT/" $CONF_DIR/$CONF
-                sed -i "s/_OSAPI_COMPUTE_WORKERS_/$OSAPI_COMPUTE_WORKERS/" $CONF_DIR/$CONF
-                sed -i "s/_METADATA_LISTEN_IP_/$METADATA_LISTEN_IP/" $CONF_DIR/$CONF
-                sed -i "s/_METADATA_LISTEN_PORT_/$METADATA_LISTEN_PORT/" $CONF_DIR/$CONF
-                sed -i "s/_METADATA_WORKERS_/$METADATA_WORKERS/" $CONF_DIR/$CONF
-                sed -i "s/_ADMIN_TENANT_NAME_/$ADMIN_TENANT_NAME/" $CONF_DIR/$CONF
-                sed -i "s/_ADMIN_USER_/$ADMIN_USER/" $CONF_DIR/$CONF
-                sed -i "s/_ADMIN_PASSWORD_/$ADMIN_PASSWORD/" $CONF_DIR/$CONF
-                sed -i "s/_DEBUG_OPT_/$DEBUG_OPT/" $CONF_DIR/$CONF
+                sed -i "s/\b_DB_HOST_\b/$DB_HOST/" $CONF_DIR/$CONF
+                sed -i "s/\b_DB_PORT_\b/$DB_PORT/" $CONF_DIR/$CONF
+                sed -i "s/\b_DB_PASSWORD_\b/$DB_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_MY_IP_\b/$MY_IP/" $CONF_DIR/$CONF
+                sed -i "s/\b_OSAPI_LISTEN_IP_\b/$OSAPI_LISTEN_IP/" $CONF_DIR/$CONF
+                sed -i "s/\b_OSAPI_LISTEN_PORT_\b/$OSAPI_LISTEN_PORT/" $CONF_DIR/$CONF
+                sed -i "s/\b_OSAPI_COMPUTE_WORKERS_\b/$OSAPI_COMPUTE_WORKERS/" $CONF_DIR/$CONF
+                sed -i "s/\b_METADATA_LISTEN_IP_\b/$METADATA_LISTEN_IP/" $CONF_DIR/$CONF
+                sed -i "s/\b_METADATA_LISTEN_PORT_\b/$METADATA_LISTEN_PORT/" $CONF_DIR/$CONF
+                sed -i "s/\b_METADATA_WORKERS_\b/$METADATA_WORKERS/" $CONF_DIR/$CONF
+                sed -i "s/\b_ADMIN_TENANT_NAME_\b/$ADMIN_TENANT_NAME/" $CONF_DIR/$CONF
+                sed -i "s/\b_ADMIN_USER_\b/$ADMIN_USER/" $CONF_DIR/$CONF
+                sed -i "s/\b_ADMIN_PASSWORD_\b/$ADMIN_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_DEBUG_OPT_\b/$DEBUG_OPT/" $CONF_DIR/$CONF
+                sed -i "s/\b_NEUTRON_ADMIN_PASSWORD_\b/$NEUTRON_ADMIN_PASSWORD/" $CONF_DIR/$CONF
         done
         echo "$LOG_MESSAGE  ==> done"
 fi
