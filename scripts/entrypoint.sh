@@ -86,6 +86,8 @@ else
         done
 fi
 
+mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock /var/lib/nova/instances
+
 [[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage db sync
 
 echo "$LOG_MESSAGE starting nova"

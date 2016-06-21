@@ -37,7 +37,8 @@ RUN cd nova; apt-get update; \
     python-libvirt \
     openvswitch-switch \
     ebtables \
-    spice-html5; \
+    spice-html5 \
+    qemu-utils; \
     pip install -r requirements.txt; \
     pip install supervisor mysql-python; \
     python setup.py install
@@ -46,8 +47,7 @@ RUN cd nova; apt-get update; \
 RUN mkdir -p /etc/supervisor.d /var/log/supervisord
 
 # prepare necessary stuff
-RUN mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock /var/lib/nova/instances && \
-    useradd -M -s /sbin/nologin nova
+RUN useradd -M -s /sbin/nologin nova
 
 # copy nova configs
 COPY configs/nova/* /etc/nova/
