@@ -27,10 +27,13 @@ OSAPI_COMPUTE_WORKERS=${CPU_NUM}
 METADATA_LISTEN_IP=${METADATA_LISTEN_IP:-0.0.0.0}
 METADATA_LISTEN_PORT=${METADATA_LISTEN_PORT:-8775}
 METADATA_WORKERS=${CPU_NUM}
-ADMIN_TENANT_NAME=${ADMIN_TENANT_NAME:-service}
-ADMIN_USER=${ADMIN_USER:-nova}
-ADMIN_PASSWORD=${ADMIN_PASSWORD:-veryS3cr3t}
-
+GLANCE_HOST=${GLANCE_HOST:-127.0.0.1}
+NEUTRON_HOST=${NEUTRON_HOST:-127.0.0.1}
+KEYSTONE_HOST=${KEYSTONE_HOST:-127.0.0.1}
+MEMCACHED_SERVERS=${MEMCACHED_SERVERS:-127.0.0.1:11211}
+SERVICE_TENANT_NAME=${SERVICE_TENANT_NAME:-service}
+SERVICE_USER=${SERVICE_USER:-nova}
+SERVICE_PASSWORD=${SERVICE_PASSWORD:-veryS3cr3t}
 NEUTRON_ADMIN_PASSWORD=${NEUTRON_ADMIN_PASSWORD:-veryS3cr3t}
 
 LOG_MESSAGE="Docker start script:"
@@ -67,11 +70,15 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_METADATA_LISTEN_IP_\b/$METADATA_LISTEN_IP/" $CONF_DIR/$CONF
                 sed -i "s/\b_METADATA_LISTEN_PORT_\b/$METADATA_LISTEN_PORT/" $CONF_DIR/$CONF
                 sed -i "s/\b_METADATA_WORKERS_\b/$METADATA_WORKERS/" $CONF_DIR/$CONF
-                sed -i "s/\b_ADMIN_TENANT_NAME_\b/$ADMIN_TENANT_NAME/" $CONF_DIR/$CONF
-                sed -i "s/\b_ADMIN_USER_\b/$ADMIN_USER/" $CONF_DIR/$CONF
-                sed -i "s/\b_ADMIN_PASSWORD_\b/$ADMIN_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_SERVICE_TENANT_NAME_\b/$SERVICE_TENANT_NAME/" $CONF_DIR/$CONF
+                sed -i "s/\b_SERVICE_USER_\b/$SERVICE_USER/" $CONF_DIR/$CONF
+                sed -i "s/\b_SERVICE_PASSWORD_\b/$SERVICE_PASSWORD/" $CONF_DIR/$CONF
                 sed -i "s/\b_DEBUG_OPT_\b/$DEBUG_OPT/" $CONF_DIR/$CONF
                 sed -i "s/\b_NEUTRON_ADMIN_PASSWORD_\b/$NEUTRON_ADMIN_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_GLANCE_HOST_\b/$GLANCE_HOST/" $CONF_DIR/$CONF
+                sed -i "s/\b_NEUTRON_HOST_\b/$NEUTRON_HOST/" $CONF_DIR/$CONF
+                sed -i "s/\b_KEYSTONE_HOST_\b/$KEYSTONE_HOST/" $CONF_DIR/$CONF
+                sed -i "s/\b_MEMCACHED_SERVERS_\b/$MEMCACHED_SERVERS/" $CONF_DIR/$CONF
         done
         echo "$LOG_MESSAGE  ==> done"
 fi
@@ -88,7 +95,7 @@ fi
 
 mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock /var/lib/nova/instances
 
-[[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage db sync
+[[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage api_db sync && nova-manage db sync
 
 echo "$LOG_MESSAGE starting nova"
 exec "$@"

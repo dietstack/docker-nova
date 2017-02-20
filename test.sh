@@ -51,8 +51,7 @@ get_docker_image_from_release osadmin http://${RELEASE_REPO}/docker-osadmin late
 ##### Start Containers
 
 echo "Starting galera container ..."
-GALERA_TAG=$(docker images | grep -w galera | head -n 1 | awk '{print $2}')
-docker run -d --net=host -e INITIALIZE_CLUSTER=1 -e MYSQL_ROOT_PASS=veryS3cr3t -e WSREP_USER=wsrepuser -e WSREP_PASS=wsreppass -e DEBUG= --name galera galera:$GALERA_TAG
+docker run -d --net=host -e INITIALIZE_CLUSTER=1 -e MYSQL_ROOT_PASS=veryS3cr3t -e WSREP_USER=wsrepuser -e WSREP_PASS=wsreppass -e DEBUG= --name galera galera:latest
 
 echo "Wait till galera is running ."
 wait_for_port 3306 30
@@ -74,8 +73,7 @@ create_glance_db
 create_nova_db
 
 echo "Starting keystone container"
-KEYSTONE_TAG=$(docker images | grep -w keystone | head -n 1 | awk '{print $2}')
-docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name keystone keystone:$KEYSTONE_TAG
+docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name keystone keystone:latest
 
 echo "Wait till keystone is running ."
 
@@ -94,23 +92,7 @@ if [ $ret -ne 0 ]; then
 fi
 
 echo "Starting glance container"
-GLANCE_TAG=$(docker images | grep -w glance | head -n 1 | awk '{print $2}')
-docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name glance glance:$GLANCE_TAG
-
-echo "Starting nova-controller container"
-docker run -d --net=host --privileged \
-           -e DEBUG="true" \
-           -e DB_SYNC="true" \
-           -e NOVA_CONTROLLER="true" \
-           --name nova-controller \
-           nova:latest
-
-echo "Starting nova-compute container"
-docker run -d --net=host \
-           -e DEBUG="true" \
-           -e NOVA_CONTROLLER="false" \
-           --name nova-compute \
-           nova:latest
+docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name glance glance:latest
 
 ##### Wait till underlying services are ready #####
 
@@ -142,6 +124,27 @@ if [ $ret -ne 0 ]; then
     echo "Error: Cirros image import error ${ret}!"
     exit $ret
 fi
+
+echo "Starting nova-controller container"
+docker run -d --net=host --privileged \
+           -e DEBUG="true" \
+           -e DB_SYNC="true" \
+           -e NOVA_CONTROLLER="true" \
+           --name nova-controller \
+           nova:latest
+
+echo "Starting nova-compute container"
+docker run -d --net=host  --privileged \
+           -e DEBUG="true" \
+           -e NOVA_CONTROLLER="false" \
+           -v /sys/fs/cgroup:/sys/fs/cgroup \
+           -v /var/lib/nova:/var/lib/nova \
+           -v /var/lib/libvirt:/var/lib/libvirt \
+           -v /run:/run \
+           -v /var/lib/openvswitch:/var/lib/openvswitch \
+           -v /var/run/openvswitch:/var/run/openvswitch \
+           --name nova-compute \
+           nova:latest
 
 # TESTS
 

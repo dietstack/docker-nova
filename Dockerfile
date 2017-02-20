@@ -8,7 +8,7 @@ ENV no_proxy="locahost,127.0.0.1"
 
 # Source codes to download
 ENV nova_repo="https://github.com/openstack/nova"
-ENV nova_branch="stable/liberty"
+ENV nova_branch="stable/newton"
 ENV nova_commit=""
 
 # some cleanup
@@ -16,7 +16,7 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Download nova source codes
-RUN git clone $nova_repo --single-branch --branch $nova_branch;
+RUN git clone $nova_repo --single-branch --depth=1 --branch $nova_branch;
 
 # Checkout commit, if it was defined above
 RUN if [ ! -z $nova_commit ]; then cd nova && git checkout $nova_commit; fi
@@ -40,7 +40,7 @@ RUN cd nova; apt-get update; \
     spice-html5 \
     qemu-utils; \
     pip install -r requirements.txt; \
-    pip install supervisor mysql-python; \
+    pip install supervisor python-memcached; \
     python setup.py install
 
 # prepare directories for supervisor

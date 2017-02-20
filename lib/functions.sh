@@ -48,12 +48,8 @@ get_docker_image_from_release() {
     else
         echo "Docker image ${image_name}:${version} found in local repository."
     fi
-    # if latest is not assigned to requested version, tag it
-    latest_id=$(docker images | grep ${image_name} | grep latest | awk '{print $3}')
-    tag_id=$(docker images | grep ${image_name} | grep ${version} | awk '{print $3}')
-    if [[ "$latest_id" != "$tag_id" ]]; then
-        docker tag -f ${image_name}:${version} ${image_name}:latest
-    fi
+    dimage=$(docker images | grep ${image_name} | grep ${version} | awk '{print $1}')
+    docker tag ${dimage}:${version} ${image_name}:latest
 }
 
 create_keystone_db() {
@@ -72,8 +68,10 @@ create_glance_db() {
 
 create_nova_db() {
     MYSQL_CMD="mysql -h 127.0.0.1 -P 3306 -u root -pveryS3cr3t"
+    $MYSQL_CMD -e "CREATE DATABASE nova_api;"
     $MYSQL_CMD -e "CREATE DATABASE nova;"
     $MYSQL_CMD -e "CREATE USER 'nova'@'%' IDENTIFIED BY 'veryS3cr3t';"
+    $MYSQL_CMD -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' WITH GRANT OPTION;"
     $MYSQL_CMD -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' WITH GRANT OPTION;"
 }
 
@@ -83,5 +81,3 @@ create_neutron_db() {
     $MYSQL_CMD -e "CREATE USER 'neutron'@'%' IDENTIFIED BY 'veryS3cr3t';"
     $MYSQL_CMD -e "GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' WITH GRANT OPTION;"
 }
-
-
