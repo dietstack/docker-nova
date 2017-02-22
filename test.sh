@@ -148,21 +148,21 @@ docker run -d --net=host  --privileged \
 
 # TESTS
 
-wait_for_port 8774 60
+wait_for_port 8774 120
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 8774 (Nova-Api) not bounded!"
     exit $ret
 fi
 
-wait_for_port 8775 60
+wait_for_port 8775 120
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 8775 (Metadata) not bounded!"
     exit $ret
 fi
 
-wait_for_port 6082 60
+wait_for_port 6082 120
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 6082 (spice html5proxy) not bounded!"
