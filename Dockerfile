@@ -39,7 +39,7 @@ RUN cd nova; apt-get update; \
     ebtables \
     spice-html5 \
     qemu-utils; \
-    pip install -r requirements.txt; \
+    pip install -r requirements.txt -c /requirements/upper-constraints.txt; \
     pip install supervisor python-memcached; \
     python setup.py install
 
