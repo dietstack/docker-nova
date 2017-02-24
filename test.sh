@@ -77,14 +77,14 @@ docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name keystone keyst
 
 echo "Wait till keystone is running ."
 
-wait_for_port 5000 60
+wait_for_port 5000 120
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 5000 (Keystone) not bounded!"
     exit $ret
 fi
 
-wait_for_port 35357 60
+wait_for_port 35357 120
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 35357 (Keystone Admin) not bounded!"
@@ -96,14 +96,14 @@ docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name glance glance:
 
 ##### Wait till underlying services are ready #####
 
-wait_for_port 9191 60
+wait_for_port 9191 120
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 9191 (Glance Registry) not bounded!"
     exit $ret
 fi
 
-wait_for_port 9292 60
+wait_for_port 9292 120
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 9292 (Glance API) not bounded!"
