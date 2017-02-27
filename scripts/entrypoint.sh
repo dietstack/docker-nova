@@ -34,7 +34,8 @@ MEMCACHED_SERVERS=${MEMCACHED_SERVERS:-127.0.0.1:11211}
 SERVICE_TENANT_NAME=${SERVICE_TENANT_NAME:-service}
 SERVICE_USER=${SERVICE_USER:-nova}
 SERVICE_PASSWORD=${SERVICE_PASSWORD:-veryS3cr3t}
-NEUTRON_ADMIN_PASSWORD=${NEUTRON_ADMIN_PASSWORD:-veryS3cr3t}
+NEUTRON_SERVICE_PASSWORD=${NEUTRON_SERVICE_PASSWORD:-veryS3cr3t}
+NEUTRON_SERVICE_USER=${NEUTRON_SERVICE_USER:-neutron}
 
 LOG_MESSAGE="Docker start script:"
 OVERRIDE=0
@@ -83,7 +84,8 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_SERVICE_USER_\b/$SERVICE_USER/" $CONF_DIR/$CONF
                 sed -i "s/\b_SERVICE_PASSWORD_\b/$SERVICE_PASSWORD/" $CONF_DIR/$CONF
                 sed -i "s/\b_DEBUG_OPT_\b/$DEBUG_OPT/" $CONF_DIR/$CONF
-                sed -i "s/\b_NEUTRON_ADMIN_PASSWORD_\b/$NEUTRON_ADMIN_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_NEUTRON_SERVICE_PASSWORD_\b/$NEUTRON_SERVICE_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_NEUTRON_SERVICE_USER_\b/$NEUTRON_SERVICE_USER/" $CONF_DIR/$CONF
                 sed -i "s/\b_GLANCE_HOST_\b/$GLANCE_HOST/" $CONF_DIR/$CONF
                 sed -i "s/\b_NEUTRON_HOST_\b/$NEUTRON_HOST/" $CONF_DIR/$CONF
                 sed -i "s/\b_KEYSTONE_HOST_\b/$KEYSTONE_HOST/" $CONF_DIR/$CONF
@@ -93,6 +95,7 @@ if [[ $OVERRIDE -eq 0 ]]; then
         done
         echo "$LOG_MESSAGE  ==> done"
 fi
+
 
 if [[ $NOVA_CONTROLLER == "true" ]]; then
         for SRVC in $COMPUTE_SRVCS; do
