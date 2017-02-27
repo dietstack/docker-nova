@@ -79,6 +79,7 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_NEUTRON_HOST_\b/$NEUTRON_HOST/" $CONF_DIR/$CONF
                 sed -i "s/\b_KEYSTONE_HOST_\b/$KEYSTONE_HOST/" $CONF_DIR/$CONF
                 sed -i "s/\b_MEMCACHED_SERVERS_\b/$MEMCACHED_SERVERS/" $CONF_DIR/$CONF
+                sed -i "s/\b_INSECURE_\b/$INSECURE/" $CONF_DIR/$CONF
         done
         echo "$LOG_MESSAGE  ==> done"
 fi
