@@ -44,6 +44,15 @@ OVERRIDE_DIR="/nova-override"
 CONF_FILES=(`find $CONF_DIR -maxdepth 1 -type f -printf "%f\n"`)
 CONTROL_SRVCS="nova-api nova-api-metadata nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spicehtml5proxy"
 COMPUTE_SRVCS="nova-compute"
+INSECURE=${INSECURE:-true}
+
+VIRT_TYPE=${VIRT_TYPE:-kvm}
+
+# set qemu virtualization type if necessary
+if [[ `egrep -c '(vmx|svm)' /proc/cpuinfo` == 0 && $VIRT_TYPE == "kvm" ]]; then
+    VIRT_TYPE=qemu
+fi
+
 
 # check if external configs are provided
 echo "$LOG_MESSAGE Checking if external config is provided.."
@@ -79,6 +88,7 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_NEUTRON_HOST_\b/$NEUTRON_HOST/" $CONF_DIR/$CONF
                 sed -i "s/\b_KEYSTONE_HOST_\b/$KEYSTONE_HOST/" $CONF_DIR/$CONF
                 sed -i "s/\b_MEMCACHED_SERVERS_\b/$MEMCACHED_SERVERS/" $CONF_DIR/$CONF
+                sed -i "s/\b_VIRT_TYPE_\b/$VIRT_TYPE/" $CONF_DIR/$CONF
                 sed -i "s/\b_INSECURE_\b/$INSECURE/" $CONF_DIR/$CONF
         done
         echo "$LOG_MESSAGE  ==> done"
