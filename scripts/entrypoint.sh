@@ -43,7 +43,7 @@ CONF_DIR="/etc/nova"
 SUPERVISOR_CONF_DIR="/etc/supervisor.d"
 OVERRIDE_DIR="/nova-override"
 CONF_FILES=(`find $CONF_DIR -maxdepth 1 -type f -printf "%f\n"`)
-CONTROL_SRVCS="nova-api nova-api-metadata nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spicehtml5proxy"
+CONTROL_SRVCS="nova-api nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spicehtml5proxy"
 COMPUTE_SRVCS="nova-compute"
 INSECURE=${INSECURE:-true}
 
