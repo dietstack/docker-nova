@@ -32,7 +32,8 @@ RUN cd nova; apt-get update; \
     openvswitch-switch \
     ebtables \
     spice-html5 \
-    qemu-utils; \
+    qemu-utils \
+    sudo; \
     pip install -r requirements.txt -c /requirements/upper-constraints.txt; \
     pip install supervisor python-memcached; \
     python setup.py install
