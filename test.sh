@@ -4,26 +4,27 @@
 
 GIT_REPO=172.27.10.10
 RELEASE_REPO=172.27.9.130
+CONT_PREFIX=test
 
 . lib/functions.sh
 
 cleanup() {
     echo "Clean up ..."
-    docker stop galera
-    docker stop memcached
-    docker stop rabbitmq
-    docker stop keystone
-    docker stop glance
-    docker stop nova-controller
-    docker stop nova-compute
+    docker stop ${CONT_PREFIX}_galera
+    docker stop ${CONT_PREFIX}_memcached
+    docker stop ${CONT_PREFIX}_rabbitmq
+    docker stop ${CONT_PREFIX}_keystone
+    docker stop ${CONT_PREFIX}_glance
+    docker stop ${CONT_PREFIX}_nova-controller
+    docker stop ${CONT_PREFIX}_nova-compute
 
-    docker rm galera
-    docker rm memcached
-    docker rm rabbitmq
-    docker rm keystone
-    docker rm glance
-    docker rm nova-controller
-    docker rm nova-compute
+    docker rm ${CONT_PREFIX}_galera
+    docker rm ${CONT_PREFIX}_memcached
+    docker rm ${CONT_PREFIX}_rabbitmq
+    docker rm ${CONT_PREFIX}_keystone
+    docker rm ${CONT_PREFIX}_glance
+    docker rm ${CONT_PREFIX}_nova-controller
+    docker rm ${CONT_PREFIX}_nova-compute
 }
 
 cleanup
@@ -51,16 +52,16 @@ get_docker_image_from_release osadmin http://${RELEASE_REPO}/docker-osadmin late
 ##### Start Containers
 
 echo "Starting galera container ..."
-docker run -d --net=host -e INITIALIZE_CLUSTER=1 -e MYSQL_ROOT_PASS=veryS3cr3t -e WSREP_USER=wsrepuser -e WSREP_PASS=wsreppass -e DEBUG= --name galera galera:latest
+docker run -d --net=host -e INITIALIZE_CLUSTER=1 -e MYSQL_ROOT_PASS=veryS3cr3t -e WSREP_USER=wsrepuser -e WSREP_PASS=wsreppass -e DEBUG= --name ${CONT_PREFIX}_galera galera:latest
 
 echo "Wait till galera is running ."
 wait_for_port 3306 30
 
 echo "Starting Memcached node (tokens caching) ..."
-docker run -d --net=host -e DEBUG= --name memcached memcached
+docker run -d --net=host -e DEBUG= --name ${CONT_PREFIX}_memcached memcached
 
 echo "Starting RabbitMQ container ..."
-docker run -d --net=host -e DEBUG= --name rabbitmq rabbitmq
+docker run -d --net=host -e DEBUG= --name ${CONT_PREFIX}_rabbitmq rabbitmq
 
 # build nova container from local sources
 ./build.sh
@@ -68,12 +69,14 @@ docker run -d --net=host -e DEBUG= --name rabbitmq rabbitmq
 sleep 10
 
 # create databases
-create_keystone_db
-create_glance_db
-create_nova_db
+create_db_osadmin keystone keystone veryS3cr3t veryS3cr3t
+create_db_osadmin glance glance veryS3cr3t veryS3cr3t
+create_db_osadmin nova nova veryS3cr3t veryS3cr3t
+create_db_osadmin nova_api nova veryS3cr3t veryS3cr3t
+
 
 echo "Starting keystone container"
-docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name keystone keystone:latest
+docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name ${CONT_PREFIX}_keystone keystone:latest
 
 echo "Wait till keystone is running ."
 
@@ -92,7 +95,7 @@ if [ $ret -ne 0 ]; then
 fi
 
 echo "Starting glance container"
-docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name glance glance:latest
+docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name ${CONT_PREFIX}_glance glance:latest
 
 ##### Wait till underlying services are ready #####
 
@@ -130,7 +133,7 @@ docker run -d --net=host --privileged \
            -e DEBUG="true" \
            -e DB_SYNC="true" \
            -e NOVA_CONTROLLER="true" \
-           --name nova-controller \
+           --name ${CONT_PREFIX}_nova-controller \
            nova:latest
 
 echo "Starting nova-compute container"
@@ -143,7 +146,7 @@ docker run -d --net=host  --privileged \
            -v /run:/run \
            -v /var/lib/openvswitch:/var/lib/openvswitch \
            -v /var/run/openvswitch:/var/run/openvswitch \
-           --name nova-compute \
+           --name ${CONT_PREFIX}_nova-compute \
            nova:latest
 
 # TESTS
