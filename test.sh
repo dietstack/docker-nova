@@ -114,14 +114,14 @@ if [ $ret -ne 0 ]; then
 fi
 
 # bootstrap openstack settings and upload image to glance
-docker run --net=host osadmin /bin/bash -c ". /app/adminrc; bash /app/bootstrap.sh"
+docker run --net=host osadmin /bin/bash -c ". /app/tokenrc; bash /app/bootstrap.sh"
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Keystone bootstrap error ${ret}!"
     exit $ret
 fi
 
-docker run --net=host osadmin /bin/bash -c ". /app/userrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
+docker run --net=host osadmin /bin/bash -c ". /app/adminrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Cirros image import error ${ret}!"
