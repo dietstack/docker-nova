@@ -144,8 +144,6 @@ docker run -d --net=host  --privileged \
            -v /var/lib/nova:/var/lib/nova \
            -v /var/lib/libvirt:/var/lib/libvirt \
            -v /run:/run \
-           -v /var/lib/openvswitch:/var/lib/openvswitch \
-           -v /var/run/openvswitch:/var/run/openvswitch \
            --name ${CONT_PREFIX}_nova-compute \
            nova:latest
 
