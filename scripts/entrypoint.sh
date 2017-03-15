@@ -21,6 +21,7 @@ DB_PORT=${DB_PORT:-3306}
 DB_PASSWORD=${DB_PASSWORD:-veryS3cr3t}
 
 MY_IP=${MY_IP:-127.0.0.1}
+SPICE_HOST=${SPICE_HOST:-127.0.0.1}
 OSAPI_LISTEN_IP=${OSAPI_LISTEN_IP:-0.0.0.0}
 OSAPI_LISTEN_PORT=${OSAPI_LISTEN_PORT:-8774}
 OSAPI_COMPUTE_WORKERS=${CPU_NUM}
@@ -94,6 +95,7 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_MEMCACHED_SERVERS_\b/$MEMCACHED_SERVERS/" $CONF_DIR/$CONF
                 sed -i "s/\b_VIRT_TYPE_\b/$VIRT_TYPE/" $CONF_DIR/$CONF
                 sed -i "s/\b_INSECURE_\b/$INSECURE/" $CONF_DIR/$CONF
+                sed -i "s/\b_SPICE_HOST_\b/$SPICE_HOST/" $CONF_DIR/$CONF
         done
         echo "$LOG_MESSAGE  ==> done"
 fi
