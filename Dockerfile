@@ -2,8 +2,6 @@ FROM osmaster
 
 MAINTAINER Kamil Madac (kamil.madac@t-systems.sk)
 
-ENV http_proxy="http://172.27.10.114:3128" https_proxy="http://172.27.10.114:3128" no_proxy="locahost,127.0.0.1"
-
 # Source codes to download
 ENV repo="https://github.com/openstack/nova" branch="stable/newton" commit=""
 

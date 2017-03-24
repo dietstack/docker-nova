@@ -9,6 +9,8 @@ BRANCH=master
 
 . lib/functions.sh
 
+http_proxy_args="-e http_proxy=${http_proxy:-} -e https_proxy=${https_proxy:-} -e no_proxy=${no_proxy:-}"
+
 cleanup() {
     echo "Clean up ..."
     docker stop ${CONT_PREFIX}_galera
@@ -77,7 +79,11 @@ create_db_osadmin nova_api nova veryS3cr3t veryS3cr3t
 
 
 echo "Starting keystone container"
-docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name ${CONT_PREFIX}_keystone keystone:latest
+docker run -d --net=host \
+           -e DEBUG="true" \
+           -e DB_SYNC="true" \
+           $http_proxy_args \
+           --name ${CONT_PREFIX}_keystone keystone:latest
 
 echo "Wait till keystone is running ."
 
@@ -96,7 +102,11 @@ if [ $ret -ne 0 ]; then
 fi
 
 echo "Starting glance container"
-docker run -d --net=host -e DEBUG="true" -e DB_SYNC="true" --name ${CONT_PREFIX}_glance glance:latest
+docker run -d --net=host \
+           -e DEBUG="true" \
+           -e DB_SYNC="true" \
+           $http_proxy_args \
+           --name ${CONT_PREFIX}_glance glance:latest
 
 ##### Wait till underlying services are ready #####
 
@@ -115,14 +125,14 @@ if [ $ret -ne 0 ]; then
 fi
 
 # bootstrap openstack settings and upload image to glance
-docker run --net=host osadmin /bin/bash -c ". /app/tokenrc; bash /app/bootstrap.sh"
+docker run --net=host $http_proxy_args osadmin /bin/bash -c ". /app/tokenrc; bash /app/bootstrap.sh"
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Keystone bootstrap error ${ret}!"
     exit $ret
 fi
 
-docker run --net=host osadmin /bin/bash -c ". /app/adminrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
+docker run --net=host $http_proxy_args osadmin /bin/bash -c ". /app/adminrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Cirros image import error ${ret}!"
@@ -134,6 +144,7 @@ docker run -d --net=host --privileged \
            -e DEBUG="true" \
            -e DB_SYNC="true" \
            -e NOVA_CONTROLLER="true" \
+           $http_proxy_args \
            --name ${CONT_PREFIX}_nova-controller \
            nova:latest
 
@@ -145,6 +156,7 @@ docker run -d --net=host  --privileged \
            -v /var/lib/nova:/var/lib/nova \
            -v /var/lib/libvirt:/var/lib/libvirt \
            -v /run:/run \
+           $http_proxy_args \
            --name ${CONT_PREFIX}_nova-compute \
            nova:latest
 
