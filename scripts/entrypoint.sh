@@ -103,11 +103,15 @@ fi
 
 if [[ $NOVA_CONTROLLER == "true" ]]; then
         for SRVC in $COMPUTE_SRVCS; do
-            mv ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ${SUPERVISOR_CONF_DIR}/${SRVC}.disabled
+            if [[ -f ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ]]; then
+                mv ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ${SUPERVISOR_CONF_DIR}/${SRVC}.disabled
+            fi
         done
 else
         for SRVC in $CONTROL_SRVCS; do
-            mv ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ${SUPERVISOR_CONF_DIR}/${SRVC}.disabled
+            if [[ -f ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ]]; then
+                mv ${SUPERVISOR_CONF_DIR}/${SRVC}.ini ${SUPERVISOR_CONF_DIR}/${SRVC}.disabled
+            fi
         done
 fi
 
