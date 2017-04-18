@@ -19,6 +19,8 @@ CPU_NUM=$(grep -c ^processor /proc/cpuinfo)
 DB_HOST=${DB_HOST:-127.0.0.1}
 DB_PORT=${DB_PORT:-3306}
 DB_PASSWORD=${DB_PASSWORD:-veryS3cr3t}
+RABBITMQ_HOST=${RABBITMQ_HOST:-127.0.0.1}
+RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
 
 MY_IP=${MY_IP:-127.0.0.1}
 SPICE_HOST=${SPICE_HOST:-127.0.0.1}
@@ -75,6 +77,8 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_DB_HOST_\b/$DB_HOST/" $CONF_DIR/$CONF
                 sed -i "s/\b_DB_PORT_\b/$DB_PORT/" $CONF_DIR/$CONF
                 sed -i "s/\b_DB_PASSWORD_\b/$DB_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_RABBITMQ_HOST_\b/$RABBITMQ_HOST/" $CONF_DIR/$CONF
+                sed -i "s/\b_RABBITMQ_PORT_\b/$RABBITMQ_PORT/" $CONF_DIR/$CONF
                 sed -i "s/\b_MY_IP_\b/$MY_IP/" $CONF_DIR/$CONF
                 sed -i "s/\b_OSAPI_LISTEN_IP_\b/$OSAPI_LISTEN_IP/" $CONF_DIR/$CONF
                 sed -i "s/\b_OSAPI_LISTEN_PORT_\b/$OSAPI_LISTEN_PORT/" $CONF_DIR/$CONF
