@@ -25,7 +25,11 @@ RABBITMQ_USER=${RABBITMQ_USER:-openstack}
 RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-veryS3cr3t}
 
 MY_IP=${MY_IP:-127.0.0.1}
+# SPICE_HOST should be contro node public ip
 SPICE_HOST=${SPICE_HOST:-127.0.0.1}
+# SPICE_PROXY_HOST is management IP of compute node
+SPICE_PROXY_HOST=${SPICE_PROXY_HOST:-127.0.0.1}
+
 OSAPI_LISTEN_IP=${OSAPI_LISTEN_IP:-0.0.0.0}
 OSAPI_LISTEN_PORT=${OSAPI_LISTEN_PORT:-8774}
 OSAPI_COMPUTE_WORKERS=${CPU_NUM}
@@ -104,6 +108,7 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_VIRT_TYPE_\b/$VIRT_TYPE/" $CONF_DIR/$CONF
                 sed -i "s/\b_INSECURE_\b/$INSECURE/" $CONF_DIR/$CONF
                 sed -i "s/\b_SPICE_HOST_\b/$SPICE_HOST/" $CONF_DIR/$CONF
+                sed -i "s/\b_SPICE_PROXY_HOST_\b/$SPICE_PROXY_HOST/" $CONF_DIR/$CONF
         done
         echo "$LOG_MESSAGE  ==> done"
 fi
