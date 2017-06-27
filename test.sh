@@ -40,9 +40,6 @@ get_docker_image_from_release galera http://${RELEASE_REPO}/docker-galera/${BRAN
 # pull rabbitmq docker image
 get_docker_image_from_release rabbitmq http://${RELEASE_REPO}/docker-rabbitmq/${BRANCH} latest
 
-# pull osmaster docker image
-get_docker_image_from_release osmaster http://${RELEASE_REPO}/docker-osmaster/${BRANCH} latest
-
 # pull keystone image
 get_docker_image_from_release keystone http://${RELEASE_REPO}/docker-keystone/${BRANCH} latest
 
