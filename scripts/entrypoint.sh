@@ -53,6 +53,7 @@ CONF_DIR="/etc/nova"
 SUPERVISOR_CONF_DIR="/etc/supervisor.d"
 OVERRIDE_DIR="/nova-override"
 CONF_FILES=(`find $CONF_DIR -maxdepth 1 -type f -printf "%f\n"`)
+OVERRIDE_CONF_FILES=(`find $OVERRIDE_DIR -maxdepth 1 -type f -printf "%f\n"`)
 CONTROL_SRVCS="nova-api nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spicehtml5proxy"
 COMPUTE_SRVCS="nova-compute"
 INSECURE=${INSECURE:-true}
@@ -67,10 +68,10 @@ fi
 
 # check if external configs are provided
 echo "$LOG_MESSAGE Checking if external config is provided.."
-if [[ -f "$OVERRIDE_DIR/${CONF_FILES[0]}" ]]; then
+if [[ "$(ls -A $OVERRIDE_DIR)" ]]; then
         echo "$LOG_MESSAGE  ==> external config found!. Using it."
         OVERRIDE=1
-        for CONF in ${CONF_FILES[*]}; do
+        for CONF in ${OVERRIDE_CONF_FILES[*]}; do
                 rm -f "$CONF_DIR/$CONF"
                 ln -s "$OVERRIDE_DIR/$CONF" "$CONF_DIR/$CONF"
         done
