@@ -122,12 +122,14 @@ if [ $ret -ne 0 ]; then
 fi
 
 # bootstrap openstack settings and upload image to glance
+set +e
 docker run --net=host $http_proxy_args osadmin /bin/bash -c ". /app/tokenrc; bash /app/bootstrap.sh"
 ret=$?
-if [ $ret -ne 0 ]; then
+if [ $ret -ne 0 ] && [ $ret -ne 128 ]; then
     echo "Error: Keystone bootstrap error ${ret}!"
     exit $ret
 fi
+set -e
 
 docker run --net=host $http_proxy_args osadmin /bin/bash -c ". /app/adminrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
 ret=$?
