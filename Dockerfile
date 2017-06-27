@@ -2,14 +2,15 @@ FROM osmaster
 MAINTAINER Kamil Madac (kamil.madac@t-systems.sk)
 
 # Source codes to download
-ENV repo="https://github.com/openstack/nova" branch="stable/newton" commit=""
+ENV srv_name=nova
+ENV repo="https://github.com/openstack/$srv_name" branch="stable/newton" commit="d8b30c377"
 
-# Download nova source codes
-RUN if [ -z $commit ]; then \
-       git clone $repo --single-branch --depth=1 --branch $branch; \
-    else \
+# Download source codes
+RUN if [ -n $commit ]; then \
        git clone $repo --single-branch --branch $branch; \
-       cd nova && git checkout $commit; \
+       cd $srv_name && git checkout $commit; \
+    else \
+       git clone $repo --single-branch --depth=1 --branch $branch; \
     fi
 
 # Apply source code patches
