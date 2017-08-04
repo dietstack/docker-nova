@@ -2,10 +2,7 @@
 # Integration test for glance service
 # Test runs mysql,memcached,keystone and glance container and checks whether glance is running on public and admin ports
 
-GIT_REPO=172.27.10.10
-RELEASE_REPO=172.27.9.130
 CONT_PREFIX=test
-BRANCH=master
 
 . lib/functions.sh
 
@@ -13,7 +10,7 @@ http_proxy_args="-e http_proxy=${http_proxy:-} -e https_proxy=${https_proxy:-} -
 
 cleanup() {
     echo "Clean up ..."
-    docker stop ${CONT_PREFIX}_galera
+    docker stop ${CONT_PREFIX}_mariadb
     docker stop ${CONT_PREFIX}_memcached
     docker stop ${CONT_PREFIX}_rabbitmq
     docker stop ${CONT_PREFIX}_keystone
@@ -21,7 +18,7 @@ cleanup() {
     docker stop ${CONT_PREFIX}_nova-controller
     docker stop ${CONT_PREFIX}_nova-compute
 
-    docker rm ${CONT_PREFIX}_galera
+    docker rm ${CONT_PREFIX}_mariadb
     docker rm ${CONT_PREFIX}_memcached
     docker rm ${CONT_PREFIX}_rabbitmq
     docker rm ${CONT_PREFIX}_keystone
@@ -32,41 +29,34 @@ cleanup() {
 
 cleanup
 
-##### Download/Build containers
-
-# pull galera docker image
-get_docker_image_from_release galera http://${RELEASE_REPO}/docker-galera/${BRANCH} latest
-
-# pull rabbitmq docker image
-get_docker_image_from_release rabbitmq http://${RELEASE_REPO}/docker-rabbitmq/${BRANCH} latest
-
-# pull keystone image
-get_docker_image_from_release keystone http://${RELEASE_REPO}/docker-keystone/${BRANCH} latest
-
-# pull glance image
-get_docker_image_from_release glance http://${RELEASE_REPO}/docker-glance/${BRANCH} latest
-
-# pull osadmin docker image
-get_docker_image_from_release osadmin http://${RELEASE_REPO}/docker-osadmin/${BRANCH} latest
-
 ##### Start Containers
 
-echo "Starting galera container ..."
-docker run -d --net=host -e INITIALIZE_CLUSTER=1 -e MYSQL_ROOT_PASS=veryS3cr3t -e WSREP_USER=wsrepuser -e WSREP_PASS=wsreppass -e DEBUG= --name ${CONT_PREFIX}_galera galera:latest
+echo "Starting mariadb container ..."
+docker run  --net=host -d -e MYSQL_ROOT_PASSWORD=veryS3cr3t --name ${CONT_PREFIX}_mariadb \
+       mariadb:10.2
 
-echo "Wait till galera is running ."
+echo "Wait till mariadb is running ."
 wait_for_port 3306 30
 
 echo "Starting Memcached node (tokens caching) ..."
 docker run -d --net=host -e DEBUG= --name ${CONT_PREFIX}_memcached memcached
 
+echo "Wait till Memcached is running ."
+wait_for_port 11211 30
+
 echo "Starting RabbitMQ container ..."
 docker run -d --net=host -e DEBUG= --name ${CONT_PREFIX}_rabbitmq rabbitmq
 
+wait_for_port 5672 120
+
+# create openstack user in rabbitmq
+if [[ ! `docker exec ${CONT_PREFIX}_rabbitmq rabbitmqctl list_users | grep openstack` ]]; then
+    docker exec ${CONT_PREFIX}_rabbitmq rabbitmqctl add_user openstack veryS3cr3t
+    docker exec ${CONT_PREFIX}_rabbitmq rabbitmqctl set_permissions openstack '.*' '.*' '.*'
+fi
+
 # build nova container from local sources
 ./build.sh
-
-sleep 10
 
 # create databases
 create_db_osadmin keystone keystone veryS3cr3t veryS3cr3t
