@@ -33,7 +33,7 @@ cleanup
 
 echo "Starting mariadb container ..."
 docker run  --net=host -d -e MYSQL_ROOT_PASSWORD=veryS3cr3t --name ${CONT_PREFIX}_mariadb \
-       mariadb:10.2
+       mariadb:10.1
 
 echo "Wait till mariadb is running ."
 wait_for_port 3306 30
