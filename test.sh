@@ -2,6 +2,7 @@
 # Integration test for glance service
 # Test runs mysql,memcached,keystone and glance container and checks whether glance is running on public and admin ports
 
+DOCKER_PROJ_NAME=${DOCKER_PROJ_NAME:-''}
 CONT_PREFIX=test
 
 . lib/functions.sh
@@ -62,15 +63,15 @@ fi
 create_db_osadmin keystone keystone veryS3cr3t veryS3cr3t
 create_db_osadmin glance glance veryS3cr3t veryS3cr3t
 create_db_osadmin nova nova veryS3cr3t veryS3cr3t
+#create_db_osadmin nova_cell0 nova veryS3cr3t veryS3cr3t
 create_db_osadmin nova_api nova veryS3cr3t veryS3cr3t
-
 
 echo "Starting keystone container"
 docker run -d --net=host \
            -e DEBUG="true" \
            -e DB_SYNC="true" \
            $http_proxy_args \
-           --name ${CONT_PREFIX}_keystone keystone:latest
+           --name ${CONT_PREFIX}_keystone ${DOCKER_PROJ_NAME}keystone:latest
 
 echo "Wait till keystone is running ."
 
@@ -93,7 +94,7 @@ docker run -d --net=host \
            -e DEBUG="true" \
            -e DB_SYNC="true" \
            $http_proxy_args \
-           --name ${CONT_PREFIX}_glance glance:latest
+           --name ${CONT_PREFIX}_glance ${DOCKER_PROJ_NAME}glance:latest
 
 ##### Wait till underlying services are ready #####
 
@@ -132,10 +133,12 @@ echo "Starting nova-controller container"
 docker run -d --net=host --privileged \
            -e DEBUG="true" \
            -e DB_SYNC="true" \
+           -e SETUP_CELL="true" \
            -e NOVA_CONTROLLER="true" \
            $http_proxy_args \
            --name ${CONT_PREFIX}_nova-controller \
-           nova:latest
+           ${DOCKER_PROJ_NAME}nova:latest
+
 
 echo "Starting nova-compute container"
 docker run -d --net=host  --privileged \
@@ -147,7 +150,7 @@ docker run -d --net=host  --privileged \
            -v /run:/run \
            $http_proxy_args \
            --name ${CONT_PREFIX}_nova-compute \
-           nova:latest
+           ${DOCKER_PROJ_NAME}nova:latest
 
 # TESTS
 

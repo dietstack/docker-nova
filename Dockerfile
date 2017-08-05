@@ -9,7 +9,7 @@ RUN echo 'APT::Install-Recommends "false";' >> /etc/apt/apt.conf && \
     echo 'APT::Get::Install-Suggests "false";' >> /etc/apt/apt.conf && \
     apt update; apt install -y ca-certificates wget python libpython2.7 libxml2-dev iptables \
       dnsmasq bridge-utils python-libvirt openvswitch-switch ebtables spice-html5 qemu-utils \
-      sudo && \
+      sudo nginx && \
     update-ca-certificates; \
     wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py; \
     python get-pip.py; \
@@ -41,7 +41,7 @@ RUN apt update; apt install -y $BUILD_PACKAGES && \
       cd /$SVC_NAME; pip install -r requirements.txt -c /app/upper-constraints.txt && python setup.py install && \
       rm -rf /$SVC_NAME/.git; \
     fi; \
-    pip install supervisor PyMySQL python-memcached && \
+    pip install uwsgi supervisor PyMySQL python-memcached && \
     apt remove -y --auto-remove $BUILD_PACKAGES &&  \
     apt-get clean && apt autoremove && \
     rm -rf /var/lib/apt/lists/* && rm -rf /root/.cache
@@ -50,7 +50,11 @@ RUN apt update; apt install -y $BUILD_PACKAGES && \
 RUN mkdir -p /etc/supervisor.d /var/log/supervisord
 
 # prepare necessary stuff
-RUN useradd -M -s /sbin/nologin nova
+RUN rm /etc/nginx/sites-enabled/default; \
+    mkdir -p /var/log/nginx/nova-placement-api && \
+    useradd -M -s /sbin/nologin nova && \
+    usermod -G www-data nova && \
+    mkdir -p /run/uwsgi/ && chown nova:nova /run/uwsgi && chmod 775 /run/uwsgi
 
 # copy nova configs
 COPY configs/nova/* /etc/nova/
@@ -59,6 +63,14 @@ COPY configs/nova/rootwrap.d /etc/nova/rootwrap.d
 # copy supervisor configs
 COPY configs/supervisord/supervisord.conf /etc
 COPY configs/supervisord/supervisor.d/* /etc/supervisor.d/
+
+# copy uwsgi ini files
+RUN mkdir -p /etc/uwsgi
+COPY configs/uwsgi/nova-placement-api.ini /etc/uwsgi/nova-placement-api.ini
+
+# prepare nginx configs
+RUN sed -i '1idaemon off;' /etc/nginx/nginx.conf
+COPY configs/nginx/nova-placement-api.conf /etc/nginx/sites-enabled/nova-placement-api.conf
 
 # external volume
 VOLUME /nova-override

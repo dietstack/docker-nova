@@ -43,6 +43,8 @@ MEMCACHED_SERVERS=${MEMCACHED_SERVERS:-127.0.0.1:11211}
 SERVICE_TENANT_NAME=${SERVICE_TENANT_NAME:-service}
 SERVICE_USER=${SERVICE_USER:-nova}
 SERVICE_PASSWORD=${SERVICE_PASSWORD:-veryS3cr3t}
+PLACEMENT_SERVICE_USER=${PLACEMENT_SERVICE_USER:-placement}
+PLACEMENT_SERVICE_PASSWORD=${PLACEMENT_SERVICE_PASSWORD:-veryS3cr3t}
 NEUTRON_SERVICE_PASSWORD=${NEUTRON_SERVICE_PASSWORD:-veryS3cr3t}
 NEUTRON_SERVICE_USER=${NEUTRON_SERVICE_USER:-neutron}
 NEUTRON_METADATA_SECRET=${NEUTRON_METADATA_SECRET:-veryS3cr3tmetadata}
@@ -54,7 +56,7 @@ SUPERVISOR_CONF_DIR="/etc/supervisor.d"
 OVERRIDE_DIR="/nova-override"
 CONF_FILES=(`find $CONF_DIR -maxdepth 1 -type f -printf "%f\n"`)
 OVERRIDE_CONF_FILES=(`find $OVERRIDE_DIR -maxdepth 1 -type f -printf "%f\n"`)
-CONTROL_SRVCS="nova-api nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spicehtml5proxy"
+CONTROL_SRVCS="nginx uwsgi nova-api nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spicehtml5proxy nova-placement-api"
 COMPUTE_SRVCS="nova-compute"
 INSECURE=${INSECURE:-true}
 
@@ -98,6 +100,8 @@ if [[ $OVERRIDE -eq 0 ]]; then
                 sed -i "s/\b_SERVICE_TENANT_NAME_\b/$SERVICE_TENANT_NAME/" $CONF_DIR/$CONF
                 sed -i "s/\b_SERVICE_USER_\b/$SERVICE_USER/" $CONF_DIR/$CONF
                 sed -i "s/\b_SERVICE_PASSWORD_\b/$SERVICE_PASSWORD/" $CONF_DIR/$CONF
+                sed -i "s/\b_PLACEMENT_SERVICE_USER_\b/$PLACEMENT_SERVICE_USER/" $CONF_DIR/$CONF
+                sed -i "s/\b_PLACEMENT_SERVICE_PASSWORD_\b/$PLACEMENT_SERVICE_PASSWORD/" $CONF_DIR/$CONF
                 sed -i "s/\b_DEBUG_OPT_\b/$DEBUG_OPT/" $CONF_DIR/$CONF
                 sed -i "s/\b_NEUTRON_SERVICE_PASSWORD_\b/$NEUTRON_SERVICE_PASSWORD/" $CONF_DIR/$CONF
                 sed -i "s/\b_NEUTRON_SERVICE_USER_\b/$NEUTRON_SERVICE_USER/" $CONF_DIR/$CONF
@@ -132,6 +136,9 @@ fi
 mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock /var/lib/nova/instances
 
 [[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage api_db sync && nova-manage db sync
+
+# cell_v2 setup for ocata
+#[[ $SETUP_CELL ]] && echo "Setting up cell0" && nova-manage cell_v2 map_cell0 && nova-manage db sync  && nova-manage cell_v2 create_cell --name cell0
 
 echo "$LOG_MESSAGE starting nova"
 exec "$@"
