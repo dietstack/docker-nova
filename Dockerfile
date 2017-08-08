@@ -9,7 +9,7 @@ RUN echo 'APT::Install-Recommends "false";' >> /etc/apt/apt.conf && \
     echo 'APT::Get::Install-Suggests "false";' >> /etc/apt/apt.conf && \
     apt update; apt install -y ca-certificates wget python libpython2.7 libxml2-dev iptables \
       dnsmasq bridge-utils python-libvirt openvswitch-switch ebtables spice-html5 qemu-utils \
-      sudo nginx && \
+      sudo nginx iproute2 nfs-common && \
     update-ca-certificates; \
     wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py; \
     python get-pip.py; \
