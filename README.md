@@ -3,7 +3,7 @@
 ### Using
 
 ```
-git clone git@172.27.10.10:openstack/docker-nova.git
+git clone https://github.com/dietstack/docker-nova.git
 cd docker-nova
 ./build.sh
 ```
