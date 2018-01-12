@@ -122,7 +122,8 @@ if [ $ret -ne 0 ] && [ $ret -ne 128 ]; then
 fi
 set -e
 
-docker run --net=host $http_proxy_args ${DOCKER_PROJ_NAME}osadmin /bin/bash -c ". /app/adminrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
+docker run --net=host --rm $http_proxy_args ${DOCKER_PROJ_NAME}osadmin /bin/bash -c "wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img -O /app/cirros.img; . /app/adminrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
+
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Cirros image import error ${ret}!"

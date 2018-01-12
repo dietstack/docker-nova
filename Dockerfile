@@ -9,19 +9,20 @@ RUN echo 'APT::Install-Recommends "false";' >> /etc/apt/apt.conf && \
     echo 'APT::Get::Install-Suggests "false";' >> /etc/apt/apt.conf && \
     apt update; apt install -y ca-certificates wget python libpython2.7 libxml2-dev iptables \
       dnsmasq bridge-utils python-libvirt openvswitch-switch ebtables spice-html5 qemu-utils \
-      sudo nginx iproute2 nfs-common && \
+      sudo nginx iproute2 nfs-common netbase && \
     update-ca-certificates; \
     wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py; \
     python get-pip.py; \
     rm get-pip.py; \
-    wget https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt -P /app && \
+    wget https://raw.githubusercontent.com/openstack/requirements/stable/pike/upper-constraints.txt -P /app && \
     /patches/stretch-crypto.sh && \
     apt-get clean && apt autoremove && \
     rm -rf /var/lib/apt/lists/*; rm -rf /root/.cache
 
 # Source codes to download
 ENV SVC_NAME=nova
-ENV REPO="https://github.com/openstack/$SVC_NAME" BRANCH="stable/newton" COMMIT="d8b30c377"
+ENV REPO="https://github.com/openstack/$SVC_NAME" BRANCH="stable/pike"
+#COMMIT="d8b30c377"
 
 # Install nova with dependencies
 ENV BUILD_PACKAGES="git build-essential libssl-dev libffi-dev python-dev"
