@@ -135,10 +135,10 @@ fi
 
 mkdir -p /var/log/nova /var/lib/nova /var/lib/nova/lock /var/lib/nova/instances
 
-[[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage api_db sync && nova-manage db sync
+#[[ $DB_SYNC ]] && echo "Running db_sync ..." && nova-manage api_db sync && nova-manage db sync
 
 # cell_v2 setup for ocata
-#[[ $SETUP_CELL ]] && echo "Setting up cell0" && nova-manage cell_v2 map_cell0 && nova-manage db sync  && nova-manage cell_v2 create_cell --name cell0
+[[ $DB_SYNC ]] && echo "Setting up cells" && nova-manage api_db sync && nova-manage cell_v2 map_cell0 && nova-manage cell_v2 create_cell --name cell1 && nova-manage db sync
 
 echo "$LOG_MESSAGE starting nova"
 exec "$@"

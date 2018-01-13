@@ -15,7 +15,6 @@ cleanup() {
     docker stop ${CONT_PREFIX}_memcached
     docker stop ${CONT_PREFIX}_rabbitmq
     docker stop ${CONT_PREFIX}_keystone
-    docker stop ${CONT_PREFIX}_glance
     docker stop ${CONT_PREFIX}_nova-controller
     docker stop ${CONT_PREFIX}_nova-compute
 
@@ -23,7 +22,6 @@ cleanup() {
     docker rm ${CONT_PREFIX}_memcached
     docker rm ${CONT_PREFIX}_rabbitmq
     docker rm ${CONT_PREFIX}_keystone
-    docker rm ${CONT_PREFIX}_glance
     docker rm ${CONT_PREFIX}_nova-controller
     docker rm ${CONT_PREFIX}_nova-compute
 }
@@ -61,9 +59,8 @@ fi
 
 # create databases
 create_db_osadmin keystone keystone veryS3cr3t veryS3cr3t
-create_db_osadmin glance glance veryS3cr3t veryS3cr3t
 create_db_osadmin nova nova veryS3cr3t veryS3cr3t
-#create_db_osadmin nova_cell0 nova veryS3cr3t veryS3cr3t
+create_db_osadmin nova_cell0 nova veryS3cr3t veryS3cr3t
 create_db_osadmin nova_api nova veryS3cr3t veryS3cr3t
 
 echo "Starting keystone container"
@@ -88,30 +85,7 @@ if [ $ret -ne 0 ]; then
     echo "Error: Port 35357 (Keystone Admin) not bounded!"
     exit $ret
 fi
-
-echo "Starting glance container"
-docker run -d --net=host \
-           -e DEBUG="true" \
-           -e DB_SYNC="true" \
-           $http_proxy_args \
-           --name ${CONT_PREFIX}_glance ${DOCKER_PROJ_NAME}glance:latest
-
-##### Wait till underlying services are ready #####
-
-wait_for_port 9191 120
-ret=$?
-if [ $ret -ne 0 ]; then
-    echo "Error: Port 9191 (Glance Registry) not bounded!"
-    exit $ret
-fi
-
-wait_for_port 9292 120
-ret=$?
-if [ $ret -ne 0 ]; then
-    echo "Error: Port 9292 (Glance API) not bounded!"
-    exit $ret
-fi
-
+ 
 # bootstrap openstack settings
 set +e
 docker run --net=host $http_proxy_args ${DOCKER_PROJ_NAME}osadmin /bin/bash -c ". /app/tokenrc; bash /app/bootstrap.sh"
@@ -121,14 +95,6 @@ if [ $ret -ne 0 ] && [ $ret -ne 128 ]; then
     exit $ret
 fi
 set -e
-
-docker run --net=host --rm $http_proxy_args ${DOCKER_PROJ_NAME}osadmin /bin/bash -c "wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img -O /app/cirros.img; . /app/adminrc; openstack image create --container-format bare --disk-format qcow2 --file /app/cirros.img --public cirros"
-
-ret=$?
-if [ $ret -ne 0 ]; then
-    echo "Error: Cirros image import error ${ret}!"
-    exit $ret
-fi
 
 echo "Starting nova-controller container"
 docker run -d --net=host --privileged \
