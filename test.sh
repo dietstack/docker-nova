@@ -72,14 +72,14 @@ docker run -d --net=host \
 
 echo "Wait till keystone is running ."
 
-wait_for_port 5000 120
+wait_for_port 5000 240
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 5000 (Keystone) not bounded!"
     exit $ret
 fi
 
-wait_for_port 35357 120
+wait_for_port 35357 240
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 35357 (Keystone Admin) not bounded!"
@@ -121,21 +121,21 @@ docker run -d --net=host  --privileged \
 
 # TESTS
 
-wait_for_port 8774 120
+wait_for_port 8774 240
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 8774 (Nova-Api) not bounded!"
     exit $ret
 fi
 
-wait_for_port 8775 120
+wait_for_port 8775 240
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 8775 (Metadata) not bounded!"
     exit $ret
 fi
 
-wait_for_port 6082 120
+wait_for_port 6082 240
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "Error: Port 6082 (spice html5proxy) not bounded!"
