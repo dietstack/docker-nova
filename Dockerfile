@@ -21,8 +21,7 @@ RUN echo 'APT::Install-Recommends "false";' >> /etc/apt/apt.conf && \
 
 # Source codes to download
 ENV SVC_NAME=nova
-ENV REPO="https://github.com/openstack/$SVC_NAME" BRANCH="stable/pike"
-#COMMIT="d8b30c377"
+ENV REPO="https://github.com/openstack/$SVC_NAME" BRANCH="stable/pike" COMMIT="b535f08"
 
 # Install nova with dependencies
 ENV BUILD_PACKAGES="git build-essential libssl-dev libffi-dev python-dev"
